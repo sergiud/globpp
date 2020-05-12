@@ -26,7 +26,7 @@ directory_iterator::directory_iterator()
 }
 
 directory_iterator::directory_iterator(const boost::filesystem::path& directory,
-                                       const boost::string_ref& expression)
+                                       boost::string_view expression)
     : it_(directory)
     , expr_(translate(expression))
 {

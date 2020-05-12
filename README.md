@@ -6,7 +6,7 @@ latter can be used in combination with ``boost::regex`` or ``std::regex``.
 
 ## Requirements
 
-* C++98 compiler
+* C++11 compiler
 * Boost C++ libraries 1.55
 * CMake 3.0
 

@@ -20,7 +20,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/iterator/iterator_facade.hpp>
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 
 namespace globpp {
 
@@ -35,7 +35,7 @@ class directory_iterator
 public:
     directory_iterator();
     explicit directory_iterator(const boost::filesystem::path& directory,
-            const boost::string_ref& expression);
+                                boost::string_view expression);
 
 private:
     friend class boost::iterator_core_access;

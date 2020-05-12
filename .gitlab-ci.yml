@@ -1,0 +1,43 @@
+default:
+  image: alpine
+  tags:
+    - docker
+
+before_script:
+  - apk add boost-dev cmake g++ gcovr ninja
+
+stages:
+  - build
+  - test
+  - deploy
+
+build:
+  stage: build
+  script:
+    - export CXXFLAGS=--coverage
+    - cmake -S . -B build/ -GNinja -DCMAKE_BUILD_TYPE=Debug
+    - cmake --build build/
+  artifacts:
+    untracked: true
+
+test:
+  stage: test
+  coverage: '/lines:\s+(\d+\.\d+|\d+)%/'
+  script:
+    - cd build/
+    - ctest --output-on-failure
+      # Run coverage
+    - mkdir coverage
+    - gcovr -r .. --exclude '.*examples/.*' -j$(nproc) --html --html-title glob --html-details -o coverage/report.html -s
+
+package:
+  stage: deploy
+  script:
+    - cd build/
+    - cpack -G ZIP
+  needs: ['build'] # Do not wait for test stage to complete
+  dependencies:
+    - build # We do not need artificats of the test stage
+  artifacts:
+    paths:
+      - "build/globpp-*.zip"

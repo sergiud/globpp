@@ -1,7 +1,7 @@
 //
 // globpp - Globbing patterns in C++
 //
-// Copyright 2016 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+// Copyright (C) 2020 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@
 #include <boost/regex.hpp>
 #include <boost/spirit/home/qi/parse.hpp>
 #include <boost/throw_exception.hpp>
-#include <boost/utility/string_ref.hpp>
+#include <boost/utility/string_view.hpp>
 
 #include <globpp/glob_error.hpp>
 #include <globpp/glob_grammar.hpp>
@@ -48,16 +48,22 @@ inline void translate(Iterator first, Iterator last, boost::basic_regex<typename
         BOOST_THROW_EXCEPTION(glob_error("'" + message + "' is not a valid globbing expression"));
     }
 
-    r = boost::basic_regex<Ch, Tr>(out);
+    r = boost::basic_regex<Ch, Tr>{'^' + out + '$'};
 }
 
 template<class Ch, class Tr>
-inline boost::basic_regex<Ch> translate(const boost::basic_string_ref<Ch, Tr>& expression)
+inline boost::basic_regex<Ch> translate(const boost::basic_string_view<Ch, Tr>& expression)
 {
     boost::basic_regex<Ch> r;
     translate(expression.begin(), expression.end(), r);
 
     return r;
+}
+
+template<class Ch>
+inline boost::basic_regex<Ch> translate(const Ch* expression)
+{
+    return translate<Ch, std::char_traits<Ch> >(expression);
 }
 
 } // namespace globpp

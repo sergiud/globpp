@@ -1,7 +1,7 @@
 //
 // globpp - Globbing patterns in C++
 //
-// Copyright 2016 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+// Copyright 2020 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ struct escaped_symbols<char>
         boost::spirit::qi::symbols<char, const char* const> symbols;
 
         symbols.add
-            ("?", ".?")
+            ("?", ".")
             ("*", ".*")
             (".", "\\.")
             ("{", "\\{")
@@ -73,17 +73,17 @@ struct escaped_symbols<char>
         return symbols;
     }
 
-    static const char* special()
+    static constexpr const char* special() noexcept
     {
         return "![]";
     }
 
-    static char group_start()
+    static constexpr char group_start() noexcept
     {
         return '[';
     }
 
-    static char group_end()
+    static constexpr char group_end() noexcept
     {
         return ']';
     }
