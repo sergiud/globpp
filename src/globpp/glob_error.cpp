@@ -1,7 +1,7 @@
 //
 // globpp - Globbing patterns in C++
 //
-// Copyright 2016 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+// Copyright 2020 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 //
 
 #include <globpp/glob_error.hpp>
+#include <globpp/glob_error.hpp>
 
 namespace globpp {
 
@@ -25,8 +26,6 @@ glob_error::glob_error(const std::string& message)
 {
 }
 
-glob_error::~glob_error() BOOST_NOEXCEPT
-{
-}
+glob_error::~glob_error() noexcept = default;
 
 } // namespace globpp

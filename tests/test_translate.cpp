@@ -18,14 +18,19 @@
 
 #define BOOST_TEST_MODULE globpp
 
-#include <globpp/translate.hpp>
+#include <regex>
 
+#include <boost/regex.hpp>
 #include <boost/test/included/unit_test.hpp>
 
-BOOST_AUTO_TEST_CASE(ranges)
+#include <globpp/translate.hpp>
+
+using Regexes = boost::mpl::list<std::regex, boost::regex>;
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(ranges, Regex, Regexes)
 {
-    boost::regex r1 = globpp::translate("test[1-2]");
-    boost::regex r2 = globpp::translate("test[!1-2]");
+    Regex r1 = globpp::translate<Regex>("test[1-2]");
+    Regex r2 = globpp::translate<Regex>("test[!1-2]");
 
     BOOST_TEST(regex_match("test1", r1));
     BOOST_TEST(regex_match("test2", r1));
@@ -36,19 +41,25 @@ BOOST_AUTO_TEST_CASE(ranges)
     BOOST_TEST(regex_match("test3", r2));
 }
 
-BOOST_AUTO_TEST_CASE(single_character)
+BOOST_AUTO_TEST_CASE_TEMPLATE(single_character, Regex, Regexes)
 {
-    boost::regex r1 = globpp::translate("foo?bar");
+    Regex r1 = globpp::translate<Regex>("foo?bar");
 
     BOOST_TEST(regex_match("foo!bar", r1));
     BOOST_TEST(!regex_match("foobar", r1));
 }
 
-BOOST_AUTO_TEST_CASE(any_character)
+BOOST_AUTO_TEST_CASE_TEMPLATE(any_character, Regex, Regexes)
 {
-    boost::regex r1 = globpp::translate("foo*bar");
+    Regex r1 = globpp::translate<Regex>("foo*bar");
 
     BOOST_TEST(regex_match("foo!bar", r1));
     BOOST_TEST(regex_match("foo123bar", r1));
     BOOST_TEST(regex_match("foobar", r1));
+}
+
+BOOST_AUTO_TEST_CASE_TEMPLATE(malformed, Regex, Regexes)
+{
+    BOOST_CHECK_THROW(globpp::translate<Regex>("[]"), globpp::glob_error);
+    BOOST_CHECK_NO_THROW(globpp::translate<Regex>("[][!]"));
 }

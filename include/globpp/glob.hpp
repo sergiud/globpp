@@ -1,7 +1,7 @@
 //
 // globpp - Globbing patterns in C++
 //
-// Copyright 2016 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+// Copyright 2020 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,12 @@
 // limitations under the License.
 //
 
+#ifndef GLOBPP_GLOB_HPP
+#define GLOBPP_GLOB_HPP
+
 #include <globpp/glob_error.hpp>
 #include <globpp/glob_grammar.hpp>
 #include <globpp/is_glob.hpp>
 #include <globpp/translate.hpp>
+
+#endif

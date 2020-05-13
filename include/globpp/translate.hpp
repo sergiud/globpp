@@ -16,12 +16,15 @@
 // limitations under the License.
 //
 
+#ifndef GLOBPP_TRANSLATE_HPP
+#define GLOBPP_TRANSLATE_HPP
+
 #include <cmath>
 #include <cstddef>
 #include <iterator>
+#include <regex>
 #include <string>
 
-#include <boost/regex.hpp>
 #include <boost/spirit/home/qi/parse.hpp>
 #include <boost/throw_exception.hpp>
 #include <boost/utility/string_view.hpp>
@@ -31,39 +34,57 @@
 
 namespace globpp {
 
-template<class Iterator, class Tr>
-inline void translate(Iterator first, Iterator last, boost::basic_regex<typename std::iterator_traits<Iterator>::value_type, Tr>& r)
+// clang-format off
+template
+<
+      class Iterator
+    , class Regex
+>
+// clang-format off
+inline void translate( Iterator first, Iterator last, Regex& r)
 {
     typedef typename std::iterator_traits<Iterator>::value_type Ch;
     glob_grammar<Iterator> g;
 
     std::basic_string<Ch> out;
-    out.reserve(static_cast<std::size_t>(std::ceil(static_cast<double>(std::distance(first, last)) * 1.5)));
+    out.reserve(static_cast<std::size_t>(
+        std::ceil(static_cast<double>(std::distance(first, last)) * 1.5)));
 
     Iterator savedFirst = first;
     bool succeeded = boost::spirit::qi::parse(first, last, g, out);
 
     if (!succeeded) {
-        std::string message(savedFirst, last);
-        BOOST_THROW_EXCEPTION(glob_error("'" + message + "' is not a valid globbing expression"));
+        std::string message{savedFirst, last};
+        BOOST_THROW_EXCEPTION(
+            glob_error{"'" + message + "' is not a valid globbing expression"});
     }
 
-    r = boost::basic_regex<Ch, Tr>{'^' + out + '$'};
+    r = Regex{'^' + out + '$'};
 }
 
-template<class Ch, class Tr>
-inline boost::basic_regex<Ch> translate(const boost::basic_string_view<Ch, Tr>& expression)
+template
+<
+      class Regex = std::regex
+    , class Ch
+>
+inline Regex translate(
+    const boost::basic_string_view<Ch>& expression)
 {
-    boost::basic_regex<Ch> r;
+    Regex r;
     translate(expression.begin(), expression.end(), r);
 
     return r;
 }
 
-template<class Ch>
-inline boost::basic_regex<Ch> translate(const Ch* expression)
+template
+<
+   class Regex = std::regex
+>
+inline Regex translate(const typename Regex::value_type* expression)
 {
-    return translate<Ch, std::char_traits<Ch> >(expression);
+    return translate<Regex>(boost::basic_string_view<typename Regex::value_type>{expression});
 }
 
 } // namespace globpp
+
+#endif // GLOBPP_TRANSLATE_HPP

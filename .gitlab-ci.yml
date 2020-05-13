@@ -28,7 +28,10 @@ test:
     - ctest --output-on-failure
       # Run coverage
     - mkdir coverage
-    - gcovr -r .. --exclude '.*examples/.*' -j$(nproc) --html --html-title glob --html-details -o coverage/report.html -s
+    - gcovr -r .. --filter ../include --filter ../src --filter ../tests -j$(nproc) --html --html-title glob --html-details -o coverage/report.html -s
+  artifacts:
+    paths:
+      - 'build/coverage/*'
 
 package:
   stage: deploy

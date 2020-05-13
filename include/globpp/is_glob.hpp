@@ -1,7 +1,7 @@
 //
 // globpp - Globbing patterns in C++
 //
-// Copyright 2016 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+// Copyright 2020 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
+#ifndef GLOBPP_IS_GLOB_HPP
+#define GLOBPP_IS_GLOB_HPP
 
 #include <string>
 
@@ -38,3 +41,5 @@ bool is_glob(const std::basic_string<Ch, Tr, Al>& expression)
 }
 
 } // namespace globpp
+
+#endif // GLOBPP_IS_GLOB_HPP

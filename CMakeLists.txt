@@ -18,14 +18,16 @@ add_library (globpp
   include/globpp/glob_grammar.hpp
   include/globpp/is_glob.hpp
   include/globpp/translate.hpp
-  src/globpp/directory_iterator.cpp
   src/globpp/glob_error.cpp
 )
 add_library (globpp::globpp ALIAS globpp)
 
 target_compile_features (globpp PUBLIC
+  cxx_auto_type
   cxx_constexpr
+  cxx_defaulted_functions
   cxx_noexcept
+  cxx_override
   cxx_uniform_initialization
 )
 
@@ -71,8 +73,30 @@ if (BUILD_TESTING)
   target_link_libraries (test_translate PRIVATE globpp::globpp
     Boost::unit_test_framework)
 
-  add_test (NAME glob_ranges COMMAND test_translate -t ranges)
-  add_test (NAME glob_any_character COMMAND test_translate -t any_character)
-  add_test (NAME glob_single_character COMMAND test_translate -t
-    single_character)
+  add_test (NAME glob_malformed_std_regex COMMAND test_translate -t
+    "malformed<std::*regex*")
+  add_test (NAME glob_ranges_std_regex COMMAND test_translate -t
+    "ranges<std::*regex*")
+  add_test (NAME glob_any_character_std_regex COMMAND test_translate -t
+    "any_character<std::*regex*")
+  add_test (NAME glob_single_character_std_regex COMMAND test_translate -t
+    "single_character<std::*regex*")
+
+  add_test (NAME glob_malformed_boost_regex COMMAND test_translate -t
+    "malformed<boost::*regex*")
+  add_test (NAME glob_ranges_boost_regex COMMAND test_translate -t
+    "ranges<boost::*regex*")
+  add_test (NAME glob_any_character_boost_regex COMMAND test_translate -t
+    "any_character<boost::*regex*")
+  add_test (NAME glob_single_character_boost_regex COMMAND test_translate -t
+    "single_character<boost::*regex*")
+
+  add_executable (test_directory_iterator
+    tests/test_directory_iterator.cpp
+  )
+  target_link_libraries (test_directory_iterator PRIVATE globpp::globpp
+    Boost::unit_test_framework)
+
+  add_test (NAME glob_directory_iterator_ranges COMMAND test_directory_iterator
+    -t ranges)
 endif (BUILD_TESTING)

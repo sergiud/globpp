@@ -1,7 +1,7 @@
 //
 // globpp - Globbing patterns in C++
 //
-// Copyright 2016 Sergiu Deitsch <sergiu.deitsch@gmail.com>
+// Copyright 2020 Sergiu Deitsch <sergiu.deitsch@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,14 +28,15 @@ int main(int argc, char** argv)
 {
     std::vector<std::string> patterns;
 
-    if (argc < 2)
+    if (argc < 2) {
         patterns.assign(1, "*");
-    else
+    }
+    else {
         patterns.assign(argv + 1, argv + argc);
+    }
 
-    for (std::vector<std::string>::iterator it = patterns.begin();
-         it != patterns.end(); ++it) {
-        globpp::directory_iterator it_glob(".", *it);
+    for (const auto& pattern : patterns) {
+        globpp::directory_iterator it_glob(".", pattern);
         globpp::directory_iterator end;
 
         for (; it_glob != end; ++it_glob) {

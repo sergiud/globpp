@@ -16,10 +16,11 @@
 // limitations under the License.
 //
 
-#ifndef GLOB_GRAMMAR_HPP
-#define GLOB_GRAMMAR_HPP
+#ifndef GLOBPP_GLOB_GRAMMAR_HPP
+#define GLOBPP_GLOB_GRAMMAR_HPP
 
 #include <iterator>
+#include <string>
 
 #include <boost/spirit/home/qi.hpp>
 
@@ -62,12 +63,12 @@ struct escaped_symbols<char>
         return symbols;
     }
 
-    static boost::spirit::qi::symbols<char, const char* const> group()
+    static boost::spirit::qi::symbols<char, char> negate()
     {
-        boost::spirit::qi::symbols<char, const char* const> symbols;
+        boost::spirit::qi::symbols<char, char> symbols;
 
         symbols.add
-            ("!", "^")
+            ("!", '^')
             ;
 
         return symbols;
@@ -103,37 +104,42 @@ class glob_grammar
     : public boost::spirit::qi::grammar<Iterator, std::basic_string<typename std::iterator_traits<Iterator>::value_type, Tr, Al>()>
 {
 public:
-    typedef typename std::iterator_traits<Iterator>::value_type char_type;
-    typedef std::basic_string<typename std::iterator_traits<Iterator>::value_type, Tr, Al> string_type;
+    using char_type = typename std::iterator_traits<Iterator>::value_type;
+    using string_type =
+        std::basic_string<typename std::iterator_traits<Iterator>::value_type,
+                          Tr, Al>;
 
     glob_grammar()
         : glob_grammar::base_type(start_, "globpp")
     {
         escaped_ = detail::escaped_symbols<char_type>::normal();
-        groupEscaped_ = detail::escaped_symbols<char_type>::group();
+        negate_ = detail::escaped_symbols<char_type>::negate();
 
         namespace qi = boost::spirit::qi;
 
         chars_ =
-            +((escaped_ | qi::char_) - qi::char_(detail::escaped_symbols<char_type>::special()))
+            +((escaped_ | qi::char_) - detail::escaped_symbols<char_type>::group_start())
+            ;
+
+        group_start_char_ =
+             negate_ | qi::char_
+             ;
+
+        group_chars_ =
+            +((escaped_ | qi::char_) - detail::escaped_symbols<char_type>::group_end())
             ;
 
         group_ =
-            qi::char_(detail::escaped_symbols<char_type>::group_start())
-            >>
-            -groupEscaped_
-            >>
-            chars_
-            >>
-            qi::char_(detail::escaped_symbols<char_type>::group_end())
+               qi::char_(detail::escaped_symbols<char_type>::group_start())
+            >> group_start_char_ >> group_chars_
+            >> qi::char_(detail::escaped_symbols<char_type>::group_end())
             ;
 
         start_ =
             *(
-                chars_
-                |
-                group_
-             )
+                  chars_
+                | group_
+            )
             >>
             qi::eoi
             ;
@@ -142,11 +148,13 @@ public:
 private:
     boost::spirit::qi::rule<Iterator, string_type()> start_;
     boost::spirit::qi::symbols<char_type, const char_type* const> escaped_;
-    boost::spirit::qi::symbols<char_type, const char_type* const> groupEscaped_;
+    boost::spirit::qi::symbols<char_type, char> negate_;
     boost::spirit::qi::rule<Iterator, string_type()> group_;
     boost::spirit::qi::rule<Iterator, string_type()> chars_;
+    boost::spirit::qi::rule<Iterator, string_type()> group_chars_;
+    boost::spirit::qi::rule<Iterator, string_type()> group_start_char_;
 };
 
 } // namespace globpp
 
-#endif // !defined(GLOB_GRAMMAR_HPP)
+#endif // GLOBPP_GLOB_GRAMMAR_HPP
